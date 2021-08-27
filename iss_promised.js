@@ -5,21 +5,45 @@ const urlForGEO = "https://freegeoip.app/json/";
 const urlForISS = "http://api.open-notify.org/iss-pass.json";
 
 const fetchMyIP = function() {
-  return request(urlForIP);
-  // const ipJSON =  request(urlForIP);
+  //Test - Custom error handling 
+  return new Promise((resolve, reject) => {
 
-  //  const ipJSON = request(urlForIP, (error, response, body) => {
-  //    //console.log(response.IncomingMessage);
+    request(urlForIP, (error, response, body) => {
+    
+      if (response.statusCode != 200) {
+        const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
+        reject(new Error(msg));
+        return;
+      }
 
-  //     // if (response.statusCode == 200) {
-  //     //   const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
-  //     //   throw Error(msg);
-  //     // }
+      const ipObj = JSON.parse(body);
 
-  //     //  throw Error('Make some errors!!!');
-  //  });
+      if (!ipObj.ip) {
+        reject(new Error('Can\'t find your IP address'));
+        return;
+      }
 
-  //  return ipJSON;
+      resolve(body);
+      
+    });
+  });
+  /***********************  
+  Can't catch an error at a catch bracket after .then() when an error is thrown directly.
+  ************************
+
+   const ipJSON = request(urlForIP, (error, response, body) => {
+     //console.log(response.statusCode); // It won't work. response is wrapped by somthing, I guess.
+
+      // if (response.statusCode == 200) { //pretending 200 is error.
+      //   const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
+      //   throw Error(msg);
+      // }
+
+      //  throw Error('Make some errors!!!');
+   });
+
+   return ipJSON;
+  */
 };
 
 const fetchCoordsByIP = function(ipJSON) {
