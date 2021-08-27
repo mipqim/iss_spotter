@@ -5,12 +5,19 @@ const urlForGEO = "https://freegeoip.app/json/";
 const urlForISS = "http://api.open-notify.org/iss-pass.json";
 
 const fetchMyIP = function() {
+  //return request(urlForIP);
+
   //Test - Custom error handling 
   return new Promise((resolve, reject) => {
 
     request(urlForIP, (error, response, body) => {
-    
-      if (response.statusCode != 200) {
+
+      if (error) {
+        reject(error);
+        return;
+      }
+      
+      if (response.statusCode !== 200) {
         const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
         reject(new Error(msg));
         return;
